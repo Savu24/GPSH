@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPSH — Systemy Bezpieczeństwa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+/* ─── TOKENS ─── */
+:root {
+  --white:    #FFFFFF;
+  --off:      #F5F5F3;
+  --line:     #E4E4E0;
+  --muted:    #9B9B96;
+  --body:     #3D3D3A;
+  --ink:      #111110;
+  --accent:   #1A46C4;
+  --accent-h: #1338A0;
+  --green:    #18794E;
+  --green-bg: #F0FDF7;
+
+  --font:  'DM Sans', system-ui, sans-serif;
+  --mono:  'DM Mono', monospace;
+
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* ─── BASE ─── */
+body {
+  font-family: var(--font);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ─── PAGES ─── */
+.page { display: none; }
+.page.active { display: block; animation: pgIn 220ms var(--ease-out) both; }
+@keyframes pgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  height: 60px; background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center;
+}
+.nav-inner {
+  width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+}
+.nav-logo {
+  font-size: 17px; font-weight: 500; letter-spacing: -0.3px; color: var(--ink);
+  cursor: pointer; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  background: none; border: none; font-family: var(--font);
+}
+.logo-mark {
+  width: 28px; height: 28px; background: var(--ink); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-mark svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2.2; }
+.nav-links {
+  display: flex; align-items: center; gap: 0; flex: 1; justify-content: center;
+}
+.nl {
+  font-size: 13.5px; font-weight: 400; color: var(--body); cursor: pointer;
+  padding: 8px 13px; border-radius: 7px; border: none; background: none;
+  font-family: var(--font); letter-spacing: -0.1px; white-space: nowrap;
+  transition: color 140ms ease, background 140ms ease;
+}
+.nl:hover { color: var(--ink); background: var(--off); }
+.nl.on { color: var(--ink); font-weight: 500; }
+.nav-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.nav-tel {
+  font-family: var(--mono); font-size: 13px; font-weight: 500;
+  color: var(--body); letter-spacing: 0; text-decoration: none;
+}
+.nav-tel:hover { color: var(--ink); }
+.btn-nav {
+  background: var(--ink); color: var(--white); border: none; border-radius: 8px;
+  padding: 8px 18px; font-size: 13.5px; font-weight: 500; cursor: pointer;
+  font-family: var(--font); letter-spacing: -0.1px;
+  transition: background 140ms ease, transform 100ms ease;
+}
+.btn-nav:hover { background: #2A2A28; }
+.btn-nav:active { transform: scale(0.97); }
+
+/* ─── LAYOUT ─── */
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+.section { padding: 96px 0; }
+.section-sm { padding: 72px 0; }
+.section-lg { padding: 128px 0; }
+
+/* ─── TYPE SCALE ─── */
+.t-display {
+  font-size: clamp(42px, 5.5vw, 72px);
+  font-weight: 300; letter-spacing: -2.5px; line-height: 1.04;
+  color: var(--ink);
+}
+.t-display strong { font-weight: 500; }
+.t-h2 {
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 300; letter-spacing: -1.2px; line-height: 1.12;
+  color: var(--ink);
+}
+.t-h2 strong { font-weight: 500; }
+.t-h3 { font-size: 18px; font-weight: 500; letter-spacing: -0.4px; line-height: 1.3; }
+.t-lead { font-size: 17px; font-weight: 300; color: var(--body); line-height: 1.7; max-width: 520px; }
+.t-body { font-size: 15px; font-weight: 300; color: var(--body); line-height: 1.75; }
+.t-small { font-size: 13px; color: var(--muted); letter-spacing: 0.01em; }
+.t-label {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); display: block; margin-bottom: 20px;
+}
+
+/* ─── BUTTONS ─── */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ink); color: var(--white); border: none; border-radius: 9px;
+  padding: 12px 24px; font-size: 15px; font-weight: 500; cursor: pointer;
+  font-family: var(--font); letter-spacing: -0.2px;
+  transition: background 140ms ease, transform 100ms ease;
+}
+.btn-primary:hover { background: #2A2A28; }
+.btn-primary:active { transform: scale(0.97); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--accent); font-size: 14px;
+  font-weight: 500; cursor: pointer; font-family: var(--font); padding: 0;
+  letter-spacing: -0.1px;
+  transition: color 140ms ease;
+}
+.btn-ghost:hover { color: var(--accent-h); }
+
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none; color: var(--ink); border: 1px solid var(--line); border-radius: 9px;
+  padding: 11px 22px; font-size: 15px; font-weight: 400; cursor: pointer;
+  font-family: var(--font); letter-spacing: -0.2px;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.btn-outline:hover { border-color: #c0c0bc; background: var(--off); }
+
+/* ─── RULE LINE ─── */
+hr { border: none; border-top: 1px solid var(--line); }
+
+/* ─── MONO BADGE ─── */
+.mono-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 5px;
+}
+.mt-green { background: var(--green-bg); color: var(--green); }
+.mt-blue  { background: #EEF2FF; color: var(--accent); }
+.mt-grey  { background: var(--off); color: var(--body); }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: blink 1.6s ease-in-out infinite; }
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.25; } }
+
+/* ─── DIVIDER ROWS ─── */
+.row-divider {
+  display: flex; align-items: stretch;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.row-divider > * {
+  flex: 1; padding: 28px 32px;
+  border-right: 1px solid var(--line);
+}
+.row-divider > *:last-child { border-right: none; }
+
+/* ─── SERVICE NAV (horizontal tabs) ─── */
+.service-tabs {
+  display: flex; border-bottom: 1px solid var(--line); margin-bottom: 0;
+}
+.stab {
+  padding: 14px 20px; font-size: 14px; font-weight: 400; color: var(--muted);
+  cursor: pointer; background: none; border: none; font-family: var(--font);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color 140ms ease, border-color 140ms ease;
+  white-space: nowrap;
+}
+.stab:hover { color: var(--ink); }
+.stab.on { color: var(--ink); font-weight: 500; border-bottom-color: var(--ink); }
+
+/* ─── FAQ ─── */
+.faq-row {
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+}
+.faq-row:last-child { border-bottom: 1px solid var(--line); }
+.faq-q-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 22px 0; background: none; border: none; width: 100%;
+  text-align: left; cursor: pointer; font-family: var(--font);
+}
+.faq-q-text { font-size: 15px; font-weight: 400; color: var(--ink); letter-spacing: -0.1px; }
+.faq-icon {
+  width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: transform 200ms var(--ease-out), background 140ms ease;
+}
+.faq-icon svg { width: 10px; height: 10px; stroke: var(--body); stroke-width: 2.5; fill: none; transition: transform 200ms var(--ease-out); }
+.faq-row.open .faq-icon { background: var(--ink); }
+.faq-row.open .faq-icon svg { stroke: white; transform: rotate(45deg); }
+.faq-a-wrap { display: none; padding-bottom: 22px; }
+.faq-a-wrap p { font-size: 15px; font-weight: 300; color: var(--body); line-height: 1.75; max-width: 640px; }
+.faq-row.open .faq-a-wrap { display: block; }
+
+/* ─── TABLE ─── */
+.clean-table { width: 100%; border-collapse: collapse; }
+.clean-table th {
+  text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+.clean-table td { padding: 14px 16px; font-size: 14px; color: var(--body); border-bottom: 1px solid var(--line); font-weight: 300; }
+.clean-table tr:last-child td { border-bottom: none; }
+.clean-table tr:hover td { background: var(--off); }
+.clean-table td:first-child { font-weight: 500; color: var(--ink); }
+
+/* ─── STEP LIST ─── */
+.steps { display: flex; flex-direction: column; }
+.step {
+  display: grid; grid-template-columns: 48px 1fr; gap: 0;
+  border-top: 1px solid var(--line); padding: 28px 0;
+}
+.step:last-child { border-bottom: 1px solid var(--line); }
+.step-n {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  color: var(--muted); padding-top: 2px;
+}
+.step-body h4 { font-size: 15px; font-weight: 500; margin-bottom: 6px; letter-spacing: -0.2px; }
+.step-body p { font-size: 14px; font-weight: 300; color: var(--body); line-height: 1.7; }
+
+/* ─── CONTACT FORM ─── */
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 500; color: var(--ink); }
+.form-input, .form-select, .form-textarea {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: 9px; padding: 11px 14px; font-size: 14px; font-weight: 300;
+  font-family: var(--font); color: var(--ink); outline: none; width: 100%;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+  -webkit-appearance: none; appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17,17,16,.06);
+}
+.form-textarea { min-height: 110px; resize: vertical; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cb-row { display: flex; gap: 10px; align-items: flex-start; }
+.cb-row input[type=checkbox] { width: 15px; height: 15px; margin-top: 2px; accent-color: var(--ink); flex-shrink: 0; }
+.cb-row label { font-size: 13px; font-weight: 300; color: var(--body); line-height: 1.6; }
+
+/* ─── SIDEBAR ─── */
+.sidebar-block { border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+.sidebar-block + .sidebar-block { margin-top: 16px; }
+
+/* ─── CERT PILL ─── */
+.cert-row { display: flex; align-items: flex-start; gap: 16px; padding: 20px 0; border-top: 1px solid var(--line); }
+.cert-row:last-child { border-bottom: 1px solid var(--line); }
+.cert-row h4 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+.cert-row p { font-size: 13px; font-weight: 300; color: var(--body); line-height: 1.5; }
+.cert-num { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 4px; }
+
+/* ─── TESTIMONIAL ─── */
+.testi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.testi {
+  padding: 28px 0; border-top: 1px solid var(--line);
+}
+.testi-stars { color: var(--ink); font-size: 13px; letter-spacing: 1px; margin-bottom: 14px; }
+.testi-text { font-size: 15px; font-weight: 300; color: var(--body); line-height: 1.75; margin-bottom: 16px; font-style: italic; }
+.testi-by { font-size: 13px; font-weight: 500; }
+.testi-role { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+/* ─── REALIZATION ROW ─── */
+.real-row {
+  display: grid; grid-template-columns: 56px 1fr auto;
+  gap: 0; border-top: 1px solid var(--line); padding: 28px 0; align-items: start;
+}
+.real-row:last-child { border-bottom: 1px solid var(--line); }
+.real-n { font-family: var(--mono); font-size: 12px; color: var(--muted); padding-top: 3px; }
+.real-body h4 { font-size: 15px; font-weight: 500; letter-spacing: -0.2px; margin-bottom: 5px; }
+.real-body p { font-size: 14px; font-weight: 300; color: var(--body); line-height: 1.65; }
+.real-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.real-right { padding-top: 2px; }
+
+/* ─── LIVE PANEL ─── */
+.live-panel {
+  background: var(--ink); border-radius: 16px; overflow: hidden;
+}
+.lp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.lp-title { font-family: var(--mono); font-size: 11px; font-weight: 500; color: rgba(255,255,255,.4); letter-spacing: .08em; text-transform: uppercase; }
+.lp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.06); }
+.cam {
+  aspect-ratio: 16/9; background: #0C0C0B; position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.cam-bg {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 32px);
+}
+.cam-id { position: absolute; top: 9px; left: 10px; font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,.3); }
+.cam-rec { position: absolute; top: 9px; right: 10px; display: flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 9px; color: rgba(239,68,68,.7); }
+.rec-dot { width: 4px; height: 4px; border-radius: 50%; background: #ef4444; animation: blink 1.4s ease-in-out infinite; }
+.cam-svg { opacity: .12; }
+.lp-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 20px;
+}
+.lp-stat { font-size: 12px; font-weight: 300; color: rgba(255,255,255,.4); display: flex; align-items: center; gap: 6px; }
+
+/* ─── BRAND ROW ─── */
+.brand-strip {
+  display: flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+}
+.brand-item {
+  flex: 1; padding: 18px; text-align: center;
+  font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: -0.1px;
+  border-right: 1px solid var(--line);
+  transition: color 140ms ease, background 140ms ease;
+}
+.brand-item:last-child { border-right: none; }
+.brand-item:hover { color: var(--ink); background: var(--off); }
+
+/* ─── CONTACT INFO ROWS ─── */
+.ci-row { display: flex; align-items: center; gap: 16px; padding: 18px 0; border-top: 1px solid var(--line); }
+.ci-row:last-child { border-bottom: 1px solid var(--line); }
+.ci-label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); width: 80px; flex-shrink: 0; }
+.ci-val { font-size: 15px; font-weight: 400; color: var(--ink); }
+.ci-val a { color: var(--ink); text-decoration: none; }
+.ci-val a:hover { color: var(--accent); }
+
+/* ─── PAGE HEADER ─── */
+.pg-header { padding: 64px 0 56px; border-bottom: 1px solid var(--line); margin-bottom: 72px; }
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: var(--muted); margin-bottom: 24px;
+}
+.breadcrumb span { cursor: pointer; }
+.breadcrumb span:not(:last-child)::after { content: "/"; margin-left: 8px; color: var(--line); }
+.breadcrumb span:hover { color: var(--ink); }
+.breadcrumb span:last-child { color: var(--body); pointer-events: none; }
+
+/* ─── CONTENT SPLIT ─── */
+.split-layout { display: grid; grid-template-columns: 1fr 320px; gap: 72px; align-items: start; }
+
+/* ─── LINK LIST ─── */
+.link-list { display: flex; flex-direction: column; gap: 2px; }
+.link-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px; border-radius: 9px; cursor: pointer; font-size: 14px; font-weight: 400; color: var(--body);
+  background: none; border: none; font-family: var(--font); text-align: left;
+  transition: background 140ms ease, color 140ms ease;
+}
+.link-item:hover { background: var(--off); color: var(--ink); }
+.link-item svg { width: 13px; height: 13px; stroke: var(--muted); fill: none; stroke-width: 2; opacity: .6; }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--line); padding: 64px 0 40px; margin-top: 80px;
+}
+.footer-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
+.footer-col-label { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.footer-links { display: flex; flex-direction: column; gap: 9px; }
+.fl {
+  font-size: 14px; font-weight: 300; color: var(--body); cursor: pointer; background: none;
+  border: none; font-family: var(--font); text-align: left; padding: 0; text-decoration: none;
+  transition: color 140ms ease;
+}
+.fl:hover { color: var(--ink); }
+.footer-brand-name { font-size: 17px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 12px; }
+.footer-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; max-width: 240px; }
+.footer-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 32px; border-top: 1px solid var(--line);
+}
+.footer-copy { font-size: 12.5px; color: var(--muted); }
+
+/* ─── UTILITY ─── */
+.mt-0 { margin-top: 0; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.mt-40 { margin-top: 40px; }
+.mt-48 { margin-top: 48px; }
+.mt-56 { margin-top: 56px; }
+.mt-64 { margin-top: 64px; }
+.mt-72 { margin-top: 72px; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+/* ─── MEDIA ─── */
+@media (hover: hover) and (pointer: fine) {
+  .btn-nav:hover,
+  .btn-primary:hover,
+  .btn-outline:hover { }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page.active { animation: none; }
+  * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .nav-tel { display: none; }
+  .split-layout { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .wrap { padding: 0 20px; }
+  nav { height: 56px; }
+  .nav-inner { padding: 0 20px; }
+  .section { padding: 64px 0; }
+  .section-lg { padding: 80px 0; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .row-divider { flex-wrap: wrap; }
+  .row-divider > * { border-right: none; border-bottom: 1px solid var(--line); }
+  .row-divider > *:last-child { border-bottom: none; }
+  .brand-strip { flex-wrap: wrap; }
+  .brand-item { flex: 0 0 50%; border-right: none; border-bottom: 1px solid var(--line); }
+  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  .real-row { grid-template-columns: 40px 1fr; }
+  .real-right { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <button class="nav-logo" onclick="go('home')">
+      <div class="logo-mark">
+        <svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z"/></svg>
+      </div>
+      GPSH
+    </button>
+    <div class="nav-links">
+      <button class="nl" onclick="go('onas')">O nas</button>
+      <button class="nl" onclick="go('monitoring')">Monitoring CCTV</button>
+      <button class="nl" onclick="go('alarmy')">Alarmy SSWiN</button>
+      <button class="nl" onclick="go('dostep')">Kontrola dostępu</button>
+      <button class="nl" onclick="go('gps')">GPS / e-Toll</button>
+      <button class="nl" onclick="go('realizacje')">Realizacje</button>
+      <button class="nl" onclick="go('faq')">FAQ</button>
+    </div>
+    <div class="nav-right">
+      <a href="tel:601611500" class="nav-tel">601 611 500</a>
+      <button class="btn-nav" onclick="go('kontakt')">Bezpłatna wycena</button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════
+     PAGE: HOME
+════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <div class="wrap">
+    <div class="section-lg">
+      <div style="display:grid; grid-template-columns: 1fr 420px; gap: 64px; align-items: center;">
+        <div>
+          <span class="t-label">Warszawa i Mazowsze</span>
+          <h1 class="t-display">Bezpieczeństwo<br><strong>jest szczegółem.</strong></h1>
+          <p class="t-lead mt-24">Projektujemy i instalujemy systemy monitoringu, alarmów, kontroli dostępu oraz GPS. Ponad 15 lat, 500+ realizacji.</p>
+          <div class="flex items-center gap-12 mt-40">
+            <button class="btn-primary" onclick="go('kontakt')">
+              Bezpłatna wycena
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn-outline" onclick="go('realizacje')">Realizacje</button>
+          </div>
+          <div class="flex items-center gap-16 mt-32">
+            <span class="t-small" style="display:flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              Certyfikat KAS e-Toll
+            </span>
+            <span class="t-small" style="display:flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              Serwis 24/7
+            </span>
+            <span class="t-small" style="display:flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              Uprawnienia SEP
+            </span>
+          </div>
+        </div>
+
+        <!-- LIVE PANEL -->
+        <div class="live-panel">
+          <div class="lp-header">
+            <span class="lp-title">Panel monitoringu</span>
+            <span class="mono-tag mt-green"><span class="live-dot"></span>Live</span>
+          </div>
+          <div class="lp-grid">
+            <div class="cam"><div class="cam-bg"></div><span class="cam-id">CAM-01</span><span class="cam-rec"><span class="rec-dot"></span>REC</span><svg class="cam-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.889L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+            <div class="cam"><div class="cam-bg"></div><span class="cam-id">CAM-02</span><span class="cam-rec"><span class="rec-dot"></span>REC</span><svg class="cam-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.889L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+            <div class="cam"><div class="cam-bg"></div><span class="cam-id">CAM-03</span><span class="cam-rec"><span class="rec-dot"></span>REC</span><svg class="cam-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.889L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+            <div class="cam"><div class="cam-bg"></div><span class="cam-id">CAM-04</span><span class="cam-rec"><span class="rec-dot"></span>REC</span><svg class="cam-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.889L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+          </div>
+          <div class="lp-footer">
+            <span class="lp-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Archiwum 30 dni
+            </span>
+            <span class="mono-tag mt-blue" style="font-size:10px;">Zdalny dostęp</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="wrap">
+    <div class="row-divider">
+      <div><div style="font-size:36px;font-weight:300;letter-spacing:-1.5px;line-height:1;">500+</div><div class="t-small mt-8">Zrealizowanych instalacji</div></div>
+      <div><div style="font-size:36px;font-weight:300;letter-spacing:-1.5px;line-height:1;">15+</div><div class="t-small mt-8">Lat doświadczenia</div></div>
+      <div><div style="font-size:36px;font-weight:300;letter-spacing:-1.5px;line-height:1;">24/7</div><div class="t-small mt-8">Monitoring i serwis</div></div>
+      <div><div style="font-size:36px;font-weight:300;letter-spacing:-1.5px;line-height:1;">0 zł</div><div class="t-small mt-8">Bezpłatna wycena i wizja</div></div>
+    </div>
+  </div>
+
+  <!-- USŁUGI -->
+  <div class="wrap section">
+    <div class="flex justify-between items-start mb-0">
+      <div>
+        <span class="t-label">Usługi</span>
+        <h2 class="t-h2">Cztery obszary.<br><strong>Jeden partner.</strong></h2>
+      </div>
+      <button class="btn-ghost mt-16" onclick="go('kontakt')">Zamów wycenę →</button>
+    </div>
+    <div class="mt-48">
+      <div class="row-divider" style="display:grid;grid-template-columns:repeat(4,1fr);">
+        <div style="cursor:pointer;padding:28px 24px;" onclick="go('monitoring')">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--off);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.889L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="t-h3">Monitoring CCTV</div>
+          <p class="t-body mt-8">Kamery IP, PTZ, termowizja. Zdalny podgląd, analityka AI, archiwum.</p>
+          <button class="btn-ghost mt-16" style="font-size:13px;">Dowiedz się →</button>
+        </div>
+        <div style="cursor:pointer;padding:28px 24px;" onclick="go('alarmy')">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--off);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="t-h3">Alarmy SSWiN</div>
+          <p class="t-body mt-8">Centrale, czujniki, powiadomienia SMS. Satel, DSC, Honeywell.</p>
+          <button class="btn-ghost mt-16" style="font-size:13px;">Dowiedz się →</button>
+        </div>
+        <div style="cursor:pointer;padding:28px 24px;" onclick="go('dostep')">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--off);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="t-h3">Kontrola dostępu</div>
+          <p class="t-body mt-8">Karty, biometria, aplikacja mobilna. Zarządzanie strefami i uprawnieniami.</p>
+          <button class="btn-ghost mt-16" style="font-size:13px;">Dowiedz się →</button>
+        </div>
+        <div style="cursor:pointer;padding:28px 24px;" onclick="go('gps')">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--off);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 10c0 5.25 7 12 7 12s7-6.75 7-12c0-3.87-3.13-7-7-7z"/></svg>
+          </div>
+          <div class="t-h3">GPS / e-Toll</div>
+          <p class="t-body mt-8">Monitoring floty, trasy online, raporty. Certyfikowany operator OBU KAS.</p>
+          <button class="btn-ghost mt-16" style="font-size:13px;">Dowiedz się →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DLACZEGO GPSH -->
+  <div class="wrap section-sm" style="border-top: 1px solid var(--line);">
+    <span class="t-label">Dlaczego GPSH</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+      <div style="padding:36px 40px 36px 0;border-right:1px solid var(--line);">
+        <h2 class="t-h2" style="max-width:360px;"><strong>Projekt.</strong><br>Montaż. Serwis.</h2>
+        <p class="t-lead mt-24">Jeden zespół odpowiada za całość — od wizji lokalnej, przez projekt i instalację, po umowę serwisową. Żadnych pośredników.</p>
+        <button class="btn-primary mt-32" onclick="go('onas')">O firmie</button>
+      </div>
+      <div>
+        <div class="step-body" style="padding:28px 0 28px 40px;border-bottom:1px solid var(--line);">
+          <h4 class="t-h3">Indywidualny projekt</h4>
+          <p class="t-body mt-8">Każda instalacja projektowana pod konkretny obiekt po bezpłatnej wizji lokalnej. Żadnych gotowych szablonów.</p>
+        </div>
+        <div class="step-body" style="padding:28px 0 28px 40px;border-bottom:1px solid var(--line);">
+          <h4 class="t-h3">Certyfikowane marki</h4>
+          <p class="t-body mt-8">Hikvision, Dahua, Axis, Satel, DSC, Teltonika. Wyłącznie sprawdzony, objęty gwarancją sprzęt.</p>
+        </div>
+        <div class="step-body" style="padding:28px 0 28px 40px;">
+          <h4 class="t-h3">Serwis 24/7</h4>
+          <p class="t-body mt-8">Zdalna diagnostyka, szybka reakcja, opcjonalna umowa serwisowa SLA. Stały opiekun projektu.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REALIZACJE PREVIEW -->
+  <div class="wrap section-sm">
+    <div class="flex justify-between items-end" style="margin-bottom:0;">
+      <div>
+        <span class="t-label">Wybrane realizacje</span>
+        <h2 class="t-h2">Projekty, <strong>które zaufały.</strong></h2>
+      </div>
+      <button class="btn-ghost" onclick="go('realizacje')">Wszystkie →</button>
+    </div>
+    <div class="mt-48">
+      <div class="real-row">
+        <div class="real-n">01</div>
+        <div class="real-body">
+          <h4>Centrum Logistyczne — Grodzisk Mazowiecki</h4>
+          <p>48 kamer IP Full HD, 4 rejestratory NVR, integracja z kontrolą dostępu.</p>
+          <div class="real-tags"><span class="mono-tag mt-blue">Monitoring CCTV</span><span class="mono-tag mt-grey">48 kamer</span></div>
+        </div>
+        <div class="real-right"><button class="btn-ghost" onclick="go('realizacje')" style="font-size:13px;">Szczegóły →</button></div>
+      </div>
+      <div class="real-row">
+        <div class="real-n">02</div>
+        <div class="real-body">
+          <h4>Biurowiec Mokotów — Warszawa</h4>
+          <p>SSWiN Satel, kontrola dostępu RFID na 3 piętra, 12 stref alarmowych.</p>
+          <div class="real-tags"><span class="mono-tag mt-green">SSWiN + KD</span></div>
+        </div>
+        <div class="real-right"><button class="btn-ghost" onclick="go('realizacje')" style="font-size:13px;">Szczegóły →</button></div>
+      </div>
+      <div class="real-row">
+        <div class="real-n">03</div>
+        <div class="real-body">
+          <h4>Flota 35 pojazdów — firma transportowa</h4>
+          <p>OBU Teltonika FMT100, panel GPS online, automatyczne raporty e-Toll.</p>
+          <div class="real-tags"><span class="mono-tag mt-grey">GPS / e-Toll</span><span class="mono-tag mt-grey">35 pojazdów</span></div>
+        </div>
+        <div class="real-right"><button class="btn-ghost" onclick="go('realizacje')" style="font-size:13px;">Szczegóły →</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ PREVIEW -->
+  <div class="wrap section-sm" style="border-top:1px solid var(--line);">
+    <span class="t-label">FAQ</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
+      <h2 class="t-h2">Najczęstsze<br><strong>pytania.</strong></h2>
+      <div>
+        <div class="faq-row" onclick="toggleFaq(this)">
+          <button class="faq-q-row"><span class="faq-q-text">Czy wycena jest bezpłatna?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button>
+          <div class="faq-a-wrap"><p>Tak, całkowicie bezpłatna i bez zobowiązań. Obejmuje wizję lokalną i przygotowanie szczegółowej oferty.</p></div>
+        </div>
+        <div class="faq-row" onclick="toggleFaq(this)">
+          <button class="faq-q-row"><span class="faq-q-text">Jaki jest czas realizacji?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button>
+          <div class="faq-a-wrap"><p>Standardowe realizacje (do 20 kamer) wykonujemy w 1–3 dni roboczych od akceptacji oferty.</p></div>
+        </div>
+        <div class="faq-row" onclick="toggleFaq(this)">
+          <button class="faq-q-row"><span class="faq-q-text">Czy oferujecie serwis po instalacji?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button>
+          <div class="faq-a-wrap"><p>Tak. Gwarancja 24 miesiące oraz opcjonalne umowy SLA. Zdalna diagnostyka i wyjazd serwisowy w 24h roboczych.</p></div>
+        </div>
+        <button class="btn-ghost mt-24" onclick="go('faq')">Wszystkie pytania →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="wrap section-sm">
+    <div style="background:var(--ink);border-radius:18px;padding:56px 64px;display:flex;align-items:center;justify-content:space-between;gap:32px;">
+      <div>
+        <p style="font-size:13px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:12px;">Kontakt</p>
+        <h2 style="font-size:clamp(22px,3vw,34px);font-weight:300;letter-spacing:-1px;color:white;line-height:1.15;">Gotowy na<br><strong>wycenę?</strong></h2>
+      </div>
+      <div class="flex items-center gap-12" style="flex-shrink:0;">
+        <a href="tel:601611500" style="display:inline-flex;align-items:center;background:rgba(255,255,255,.08);color:white;border-radius:9px;padding:12px 22px;font-size:15px;font-weight:500;text-decoration:none;font-family:var(--mono);transition:background 140ms ease;" onmouseover="this.style.background='rgba(255,255,255,.13)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">601 611 500</a>
+        <button onclick="go('kontakt')" style="background:white;color:var(--ink);border:none;border-radius:9px;padding:12px 22px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font);letter-spacing:-0.1px;transition:opacity 140ms ease;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Formularz →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /home -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: MONITORING
+════════════════════════════════════════ -->
+<div class="page" id="page-monitoring">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>Monitoring CCTV</span></div>
+      <span class="t-label">Usługa</span>
+      <h1 class="t-display">Monitoring<br><strong>Przemysłowy CCTV</strong></h1>
+      <p class="t-lead mt-24">Kompleksowe systemy dozoru wizyjnego — od projektu, przez montaż, po konfigurację zdalnego podglądu i serwis.</p>
+    </div>
+
+    <div class="split-layout">
+      <div>
+        <h2 class="t-h2" style="margin-bottom:40px;"><strong>Zakres</strong> usługi</h2>
+        <div class="steps">
+          <div class="step"><div class="step-n">01</div><div class="step-body"><h4>Projekt i wizja lokalna</h4><p>Bezpłatna analiza obiektu, dobór kamer i rejestratorów, plan okablowania i stref.</p></div></div>
+          <div class="step"><div class="step-n">02</div><div class="step-body"><h4>Montaż i konfiguracja</h4><p>Własna ekipa z uprawnieniami SEP. Konfiguracja zdalnego dostępu, aplikacja mobilna.</p></div></div>
+          <div class="step"><div class="step-n">03</div><div class="step-body"><h4>Zapis i archiwizacja</h4><p>Rejestrator NVR/DVR, zapis lokalny lub chmurowy. Konfigurowalne okresy archiwizacji.</p></div></div>
+          <div class="step"><div class="step-n">04</div><div class="step-body"><h4>Analityka wideo AI</h4><p>Detekcja ruchu, wykrywanie twarzy, alarmy przy przekroczeniu stref, integracja z SSWiN.</p></div></div>
+          <div class="step"><div class="step-n">05</div><div class="step-body"><h4>Serwis i wsparcie</h4><p>Umowy SLA, zdalna diagnostyka, wymiana sprzętu. Gwarancja 24 miesiące na wykonanie.</p></div></div>
+        </div>
+
+        <h2 class="t-h2 mt-64" style="margin-bottom:24px;"><strong>Rodzaje</strong> systemów</h2>
+        <table class="clean-table">
+          <thead><tr><th>Typ</th><th>Rozdzielczość</th><th>Przeznaczenie</th></tr></thead>
+          <tbody>
+            <tr><td>Kamery IP</td><td>4–8 MP</td><td>Obiekty przemysłowe, biurowce</td></tr>
+            <tr><td>HD-TVI / AHD</td><td>2–4 MP</td><td>Modernizacja instalacji analogowych</td></tr>
+            <tr><td>Kamery PTZ</td><td>2–4 MP</td><td>Duże obszary, place, parkingi</td></tr>
+            <tr><td>Termowizja</td><td>384×288 IR</td><td>Ochrona perymetu, detekcja intruza</td></tr>
+            <tr><td>Rejestrator NVR/DVR</td><td>do 64 kanałów</td><td>Centralne nagrywanie i zarządzanie</td></tr>
+          </tbody>
+        </table>
+
+        <h2 class="t-h2 mt-64" style="margin-bottom:20px;"><strong>Marki</strong></h2>
+        <div class="brand-strip">
+          <div class="brand-item">Hikvision</div>
+          <div class="brand-item">Dahua</div>
+          <div class="brand-item">Axis</div>
+          <div class="brand-item">Bosch</div>
+          <div class="brand-item">Hanwha</div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div>
+        <div class="sidebar-block" style="background:var(--ink);color:white;border-color:transparent;">
+          <p style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px;">Kontakt</p>
+          <p style="font-size:17px;font-weight:300;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:24px;">Bezpłatna wycena.<br>Oddzwonimy w 2h.</p>
+          <a href="tel:601611500" style="display:block;background:rgba(255,255,255,.1);color:white;border-radius:9px;padding:12px 0;text-align:center;font-weight:500;font-size:16px;font-family:var(--mono);text-decoration:none;margin-bottom:10px;transition:background 140ms;" onmouseover="this.style.background='rgba(255,255,255,.16)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">601 611 500</a>
+          <button onclick="go('kontakt')" style="display:block;width:100%;background:white;color:var(--ink);border:none;border-radius:9px;padding:12px 0;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);">Formularz wyceny</button>
+        </div>
+        <div class="sidebar-block mt-16">
+          <p class="t-label" style="margin-bottom:16px;">Inne usługi</p>
+          <div class="link-list">
+            <button class="link-item" onclick="go('alarmy')">Alarmy SSWiN <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button class="link-item" onclick="go('dostep')">Kontrola dostępu <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button class="link-item" onclick="go('gps')">GPS / e-Toll <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div class="sidebar-block mt-16">
+          <p class="t-label" style="margin-bottom:12px;">Certyfikaty</p>
+          <div class="flex flex-col gap-8">
+            <span class="mono-tag mt-grey" style="width:fit-content;">SEP — Uprawnienia elektryczne</span>
+            <span class="mono-tag mt-blue" style="width:fit-content;">Autoryzowany partner Hikvision</span>
+            <span class="mono-tag mt-green" style="width:fit-content;">PSSB / SITP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /monitoring -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: ALARMY
+════════════════════════════════════════ -->
+<div class="page" id="page-alarmy">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>Alarmy SSWiN</span></div>
+      <span class="t-label">Usługa</span>
+      <h1 class="t-display">Systemy<br><strong>Alarmowe SSWiN</strong></h1>
+      <p class="t-lead mt-24">Sygnalizacja włamania i napadu. Centrale, czujniki, powiadomienia SMS i integracja z monitoringiem CCTV.</p>
+    </div>
+    <div class="split-layout">
+      <div>
+        <h2 class="t-h2" style="margin-bottom:40px;"><strong>Zakres</strong> usługi</h2>
+        <div class="steps">
+          <div class="step"><div class="step-n">01</div><div class="step-body"><h4>Centrala alarmowa</h4><p>Centrale Satel, DSC, Honeywell do 128 stref. Integracja z BMS i zewnętrznymi systemami.</p></div></div>
+          <div class="step"><div class="step-n">02</div><div class="step-body"><h4>Czujniki i detektory</h4><p>PIR, dualne PIR+MW, kontakty magnetyczne, stłuczenie szyby, dymowe, wibracyjne.</p></div></div>
+          <div class="step"><div class="step-n">03</div><div class="step-body"><h4>Powiadomienia</h4><p>SMS, push w aplikacji mobilnej, połączenie ze stacją monitoringu lub grupą reagowania.</p></div></div>
+          <div class="step"><div class="step-n">04</div><div class="step-body"><h4>Integracja z CCTV</h4><p>Automatyczne nagrywanie po wyzwoleniu alarmu. Wizualna weryfikacja zdarzenia.</p></div></div>
+        </div>
+
+        <h2 class="t-h2 mt-64" style="margin-bottom:20px;"><strong>Marki</strong></h2>
+        <div class="brand-strip">
+          <div class="brand-item">Satel</div>
+          <div class="brand-item">DSC</div>
+          <div class="brand-item">Honeywell</div>
+          <div class="brand-item">Paradox</div>
+          <div class="brand-item">Bosch</div>
+        </div>
+      </div>
+      <div>
+        <div class="sidebar-block" style="background:var(--ink);color:white;border-color:transparent;">
+          <p style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px;">Kontakt</p>
+          <p style="font-size:17px;font-weight:300;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:24px;">Bezpłatna wycena.<br>Oddzwonimy w 2h.</p>
+          <a href="tel:601611500" style="display:block;background:rgba(255,255,255,.1);color:white;border-radius:9px;padding:12px 0;text-align:center;font-weight:500;font-size:16px;font-family:var(--mono);text-decoration:none;margin-bottom:10px;" onmouseover="this.style.background='rgba(255,255,255,.16)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">601 611 500</a>
+          <button onclick="go('kontakt')" style="display:block;width:100%;background:white;color:var(--ink);border:none;border-radius:9px;padding:12px 0;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);">Formularz wyceny</button>
+        </div>
+        <div class="sidebar-block mt-16">
+          <p class="t-label" style="margin-bottom:16px;">Inne usługi</p>
+          <div class="link-list">
+            <button class="link-item" onclick="go('monitoring')">Monitoring CCTV <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button class="link-item" onclick="go('dostep')">Kontrola dostępu <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button class="link-item" onclick="go('gps')">GPS / e-Toll <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /alarmy -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: DOSTEP
+════════════════════════════════════════ -->
+<div class="page" id="page-dostep">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>Kontrola dostępu</span></div>
+      <span class="t-label">Usługa</span>
+      <h1 class="t-display">Kontrola<br><strong>Dostępu KD</strong></h1>
+      <p class="t-lead mt-24">Zarządzanie uprawnieniami wejścia. Karty RFID, kody PIN, biometria, aplikacja mobilna, strefy i harmonogramy.</p>
+    </div>
+    <div class="split-layout">
+      <div>
+        <h2 class="t-h2" style="margin-bottom:40px;"><strong>Technologie</strong> dostępu</h2>
+        <div class="steps">
+          <div class="step"><div class="step-n">—</div><div class="step-body"><h4>Karty RFID / zbliżeniowe</h4><p>Karty i breloki Mifare, EM. Blokada zgubionych kart w kilka sekund bez serwisanta.</p></div></div>
+          <div class="step"><div class="step-n">—</div><div class="step-body"><h4>Biometria</h4><p>Odcisk palca, rozpoznawanie twarzy. Brak ryzyka zgubienia lub przekazania dostępu.</p></div></div>
+          <div class="step"><div class="step-n">—</div><div class="step-body"><h4>Aplikacja mobilna / NFC</h4><p>Telefon jako karta dostępu. Zarządzanie uprawnieniami zdalnie, bez fizycznej obecności.</p></div></div>
+          <div class="step"><div class="step-n">—</div><div class="step-body"><h4>Zarządzanie strefami</h4><p>Mapa stref, harmonogramy, raporty wejść/wyjść. Integracja z systemami HR i kadrą.</p></div></div>
+        </div>
+
+        <h2 class="t-h2 mt-64" style="margin-bottom:24px;"><strong>Dobór</strong> systemu</h2>
+        <table class="clean-table">
+          <thead><tr><th>Typ obiektu</th><th>Zalecane rozwiązanie</th><th>Punkty KD</th></tr></thead>
+          <tbody>
+            <tr><td>Małe biuro (do 10 os.)</td><td>Czytnik + kody PIN</td><td>1–3</td></tr>
+            <tr><td>Biurowiec wielopiętrowy</td><td>Karty RFID, serwer zarządzania</td><td>10–100+</td></tr>
+            <tr><td>Magazyn / hala</td><td>Biometria + karty + RCP</td><td>5–30</td></tr>
+            <tr><td>Obiekt przemysłowy</td><td>Strefy bezpieczeństwa, interlocking</td><td>20–200+</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="sidebar-block" style="background:var(--ink);color:white;border-color:transparent;">
+          <p style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px;">Kontakt</p>
+          <p style="font-size:17px;font-weight:300;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:24px;">Bezpłatna wycena.<br>Oddzwonimy w 2h.</p>
+          <a href="tel:601611500" style="display:block;background:rgba(255,255,255,.1);color:white;border-radius:9px;padding:12px 0;text-align:center;font-weight:500;font-size:16px;font-family:var(--mono);text-decoration:none;margin-bottom:10px;" onmouseover="this.style.background='rgba(255,255,255,.16)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">601 611 500</a>
+          <button onclick="go('kontakt')" style="display:block;width:100%;background:white;color:var(--ink);border:none;border-radius:9px;padding:12px 0;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);">Formularz wyceny</button>
+        </div>
+        <div class="sidebar-block mt-16">
+          <p class="t-label" style="margin-bottom:16px;">Inne usługi</p>
+          <div class="link-list">
+            <button class="link-item" onclick="go('monitoring')">Monitoring CCTV <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button class="link-item" onclick="go('alarmy')">Alarmy SSWiN <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button class="link-item" onclick="go('gps')">GPS / e-Toll <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /dostep -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: GPS / ETOLL
+════════════════════════════════════════ -->
+<div class="page" id="page-gps">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>GPS / e-Toll</span></div>
+      <span class="t-label">Usługa</span>
+      <h1 class="t-display">Monitoring GPS<br><strong>i e-Toll</strong></h1>
+      <p class="t-lead mt-24">Lokalizacja floty w czasie rzeczywistym i certyfikowana obsługa systemu e-Toll KAS. Urządzenia OBU Teltonika FMT100.</p>
+    </div>
+    <div class="split-layout">
+      <div>
+        <!-- CERT BLOCK -->
+        <div style="border:1px solid var(--line);border-radius:14px;padding:28px;display:flex;gap:20px;align-items:flex-start;margin-bottom:56px;">
+          <div style="width:44px;height:44px;background:var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <div>
+            <div class="t-h3">Certyfikowany operator e-Toll KAS</div>
+            <p class="t-body mt-8">GPSH posiada zezwolenie Krajowej Administracji Skarbowej na świadczenie usług e-Toll jako zewnętrzny dostawca.</p>
+            <div class="mt-12"><span class="mono-tag mt-blue">DPO15.8751.97.2021</span></div>
+          </div>
+        </div>
+
+        <h2 class="t-h2" style="margin-bottom:40px;"><strong>Zakres</strong> usługi</h2>
+        <div class="steps">
+          <div class="step"><div class="step-n">01</div><div class="step-body"><h4>Lokalizacja GPS online</h4><p>Podgląd pozycji w czasie rzeczywistym, historia tras z dokładnością do 10 sekund.</p></div></div>
+          <div class="step"><div class="step-n">02</div><div class="step-body"><h4>Raporty i analizy</h4><p>Automatyczne raporty przejazdów, czasu pracy, zużycia paliwa. Export do Excel/PDF.</p></div></div>
+          <div class="step"><div class="step-n">03</div><div class="step-body"><h4>Obsługa e-Toll</h4><p>Montaż i aktywacja OBU, zarządzanie kontem e-Toll, doładowania, wsparcie techniczne.</p></div></div>
+          <div class="step"><div class="step-n">04</div><div class="step-body"><h4>Rejestracja czasu pracy</h4><p>Automatyczne RCP kierowców. Integracja z systemami kadr i płac.</p></div></div>
+        </div>
+
+        <h2 class="t-h2 mt-64" style="margin-bottom:24px;"><strong>Urządzenia</strong> OBU</h2>
+        <table class="clean-table">
+          <thead><tr><th>Model</th><th>Pojazd</th><th>Funkcje</th></tr></thead>
+          <tbody>
+            <tr><td>Teltonika FMT100</td><td>Pojazdy ciężkie, autobusy</td><td>e-Toll, GPS, CAN, tachograf</td></tr>
+            <tr><td>Teltonika FMB120</td><td>Osobowe i dostawcze</td><td>GPS, historia tras, raporty</td></tr>
+            <tr><td>Teltonika FMB140</td><td>Floty mieszane</td><td>GPS, CAN, paliwomierz, RFID</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="sidebar-block" style="background:var(--ink);color:white;border-color:transparent;">
+          <p style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px;">Kontakt</p>
+          <p style="font-size:17px;font-weight:300;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:24px;">Pakiety dla flot.<br>Bezpłatna wycena.</p>
+          <a href="tel:601611500" style="display:block;background:rgba(255,255,255,.1);color:white;border-radius:9px;padding:12px 0;text-align:center;font-weight:500;font-size:16px;font-family:var(--mono);text-decoration:none;margin-bottom:10px;" onmouseover="this.style.background='rgba(255,255,255,.16)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">601 611 500</a>
+          <button onclick="go('kontakt')" style="display:block;width:100%;background:white;color:var(--ink);border:none;border-radius:9px;padding:12px 0;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);">Formularz wyceny</button>
+        </div>
+        <div class="sidebar-block mt-16">
+          <p class="t-label" style="margin-bottom:12px;">Panele klienta</p>
+          <a href="https://s1.gpsh.pl" target="_blank" class="link-item" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:9px;font-size:14px;color:var(--body);text-decoration:none;transition:background 140ms;">Panel s1.gpsh.pl <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+          <a href="https://s2.gpsh.pl" target="_blank" class="link-item" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:9px;font-size:14px;color:var(--body);text-decoration:none;transition:background 140ms;">Panel s2.gpsh.pl <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /gps -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: O NAS
+════════════════════════════════════════ -->
+<div class="page" id="page-onas">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>O nas</span></div>
+      <span class="t-label">Firma</span>
+      <h1 class="t-display">Systemy<br><strong>bezpieczeństwa.</strong><br>Od 2009.</h1>
+      <p class="t-lead mt-24">Specjalizujemy się w projektowaniu i wdrażaniu systemów ochrony technicznej dla firm i obiektów komercyjnych na terenie Warszawy i Mazowsza.</p>
+    </div>
+
+    <!-- MISJA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-bottom:80px;">
+      <div>
+        <span class="t-label">Misja</span>
+        <p class="t-body">GPSH to firma, która traktuje bezpieczeństwo jako szczegół. Nie sprzedajemy gotowych pakietów — każdy projekt poprzedzamy analizą, każdą instalację dokumentujemy, każdego klienta obejmujemy stałą opieką.</p>
+        <p class="t-body mt-16">Pracujemy wyłącznie ze sprawdzonym sprzętem renomowanych producentów i stosujemy metody instalacji, które wytrzymują próbę czasu.</p>
+      </div>
+      <div class="row-divider" style="display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+        <div style="padding:24px;border-right:1px solid var(--line);border-top:none;border-bottom:none;"><div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;">500+</div><div class="t-small mt-8">Instalacji</div></div>
+        <div style="padding:24px;"><div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;">15+</div><div class="t-small mt-8">Lat</div></div>
+        <div style="padding:24px;border-top:1px solid var(--line);border-right:1px solid var(--line);"><div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;">24/7</div><div class="t-small mt-8">Serwis</div></div>
+        <div style="padding:24px;border-top:1px solid var(--line);"><div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;">Maz.</div><div class="t-small mt-8">Region</div></div>
+      </div>
+    </div>
+
+    <!-- CERTYFIKATY -->
+    <span class="t-label">Certyfikaty i uprawnienia</span>
+    <h2 class="t-h2 mt-0" style="margin-bottom:40px;"><strong>Podstawy</strong> naszej pracy.</h2>
+    <div class="cert-row" style="border-top:none;">
+      <div><span class="mono-tag mt-grey">SEP</span></div>
+      <div><h4>Świadectwo kwalifikacyjne</h4><p>Uprawnienia do projektowania i eksploatacji urządzeń elektrycznych, elektronicznych i automatyki.</p></div>
+    </div>
+    <div class="cert-row">
+      <div><span class="mono-tag mt-green">e-Toll KAS</span></div>
+      <div><h4>Certyfikat Operatora e-Toll</h4><p>Zezwolenie Krajowej Administracji Skarbowej na obsługę systemu e-Toll jako zewnętrzny dostawca.</p><div class="cert-num">DPO15.8751.97.2021</div></div>
+    </div>
+    <div class="cert-row">
+      <div><span class="mono-tag mt-blue">PSSB</span></div>
+      <div><h4>Polskie Stowarzyszenie Systemów Bezpieczeństwa</h4><p>Członkostwo w branżowym stowarzyszeniu. Dostęp do wiedzy, norm i standardów wykonania.</p></div>
+    </div>
+    <div class="cert-row">
+      <div><span class="mono-tag mt-grey">OEM</span></div>
+      <div><h4>Autoryzacje producentów</h4><p>Autoryzowany partner Hikvision, Satel, Teltonika i innych czołowych marek systemów bezpieczeństwa.</p></div>
+    </div>
+
+    <!-- REFERENCJE -->
+    <h2 class="t-h2 mt-72" style="margin-bottom:0;"><strong>Referencje</strong></h2>
+    <div class="testi-grid mt-40">
+      <div class="testi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">„Profesjonalne podejście od pierwszego kontaktu. Wizja, projekt, montaż w terminie. System działa bez zarzutu od 2 lat."</p>
+        <div class="testi-by">Tomasz W.</div>
+        <div class="testi-role">Manager operacyjny, centrum logistyczne</div>
+      </div>
+      <div class="testi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">„Polecam każdemu kto szuka rzetelnej firmy do monitoringu. Szybka reakcja serwisowa, pełen profesjonalizm i jasna komunikacja."</p>
+        <div class="testi-by">Anna K.</div>
+        <div class="testi-role">Właścicielka, sieć sklepów</div>
+      </div>
+      <div class="testi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">„GPS dla floty i obsługa e-Toll w jednym miejscu. Oszczędność czasu i żadnych problemów administracyjnych przez rok."</p>
+        <div class="testi-by">Marek S.</div>
+        <div class="testi-role">Dyrektor, firma transportowa</div>
+      </div>
+    </div>
+
+    <!-- OBSZAR -->
+    <div style="border-top:1px solid var(--line);margin-top:72px;padding-top:64px;">
+      <span class="t-label">Obszar działania</span>
+      <h2 class="t-h2" style="margin-bottom:28px;">Warszawa <strong>i Mazowsze.</strong></h2>
+      <div class="flex flex-col gap-8" style="max-width:560px;">
+        <p class="t-body">Obsługujemy klientów na terenie Warszawy i całego województwa mazowieckiego. Dojeżdżamy bezpłatnie do każdego obiektu w tym obszarze.</p>
+        <div class="flex items-center gap-8 mt-16" style="flex-wrap:wrap;">
+          <span class="mono-tag mt-grey">Warszawa</span><span class="mono-tag mt-grey">Pruszków</span><span class="mono-tag mt-grey">Grodzisk Maz.</span><span class="mono-tag mt-grey">Piaseczno</span><span class="mono-tag mt-grey">Legionowo</span><span class="mono-tag mt-grey">Wołomin</span><span class="mono-tag mt-grey">Nowy Dwór Maz.</span><span class="mono-tag mt-grey">Żyrardów</span><span class="mono-tag mt-grey">Otwock</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /onas -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: REALIZACJE
+════════════════════════════════════════ -->
+<div class="page" id="page-realizacje">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>Realizacje</span></div>
+      <span class="t-label">Portfolio</span>
+      <h1 class="t-display">Wybrane<br><strong>realizacje.</strong></h1>
+      <p class="t-lead mt-24">Każda instalacja zaprojektowana i wykonana przez nasz zespół. Żadnych podwykonawców.</p>
+    </div>
+
+    <div class="real-row" style="border-top:none;">
+      <div class="real-n">01</div>
+      <div class="real-body"><h4>Centrum Logistyczne — Grodzisk Mazowiecki</h4><p>48 kamer IP Full HD, 4 rejestratory NVR, integracja z kontrolą dostępu. Zdalny podgląd dla 5 lokalizacji zarządu.</p><div class="real-tags"><span class="mono-tag mt-blue">Monitoring CCTV</span><span class="mono-tag mt-grey">48 kamer</span><span class="mono-tag mt-grey">IP / NVR</span></div></div>
+      <div class="real-right"><span class="mono-tag mt-grey">2023</span></div>
+    </div>
+    <div class="real-row">
+      <div class="real-n">02</div>
+      <div class="real-body"><h4>Biurowiec Mokotów — Warszawa</h4><p>System alarmowy SSWiN Satel, kontrola dostępu RFID na 3 piętra, integracja z monitoringiem. 12 stref alarmowych.</p><div class="real-tags"><span class="mono-tag mt-blue">SSWiN</span><span class="mono-tag mt-green">Kontrola dostępu</span><span class="mono-tag mt-grey">Satel</span></div></div>
+      <div class="real-right"><span class="mono-tag mt-grey">2023</span></div>
+    </div>
+    <div class="real-row">
+      <div class="real-n">03</div>
+      <div class="real-body"><h4>Flota 35 pojazdów — firma transportowa</h4><p>35 urządzeń OBU Teltonika FMT100, panel GPS, automatyczne raporty tras, czasu pracy i obsługa e-Toll.</p><div class="real-tags"><span class="mono-tag mt-grey">GPS</span><span class="mono-tag mt-green">e-Toll</span><span class="mono-tag mt-grey">35 pojazdów</span></div></div>
+      <div class="real-right"><span class="mono-tag mt-grey">2022</span></div>
+    </div>
+    <div class="real-row">
+      <div class="real-n">04</div>
+      <div class="real-body"><h4>Centrum Handlowe — Pruszków</h4><p>Rozbudowa CCTV o 24 kamery PTZ, upgrade rejestratora do 64 kanałów, integracja z systemem BMS.</p><div class="real-tags"><span class="mono-tag mt-blue">Monitoring CCTV</span><span class="mono-tag mt-grey">PTZ</span><span class="mono-tag mt-grey">BMS</span></div></div>
+      <div class="real-right"><span class="mono-tag mt-grey">2022</span></div>
+    </div>
+    <div class="real-row">
+      <div class="real-n">05</div>
+      <div class="real-body"><h4>Zakład Produkcyjny — Grodzisk Mazowiecki</h4><p>32 kamery (w tym termowizja na perymecie), SSWiN, kontrola dostępu z biometrią dla 80 pracowników.</p><div class="real-tags"><span class="mono-tag mt-blue">Monitoring CCTV</span><span class="mono-tag mt-green">SSWiN + KD</span><span class="mono-tag mt-grey">Termowizja</span></div></div>
+      <div class="real-right"><span class="mono-tag mt-grey">2021</span></div>
+    </div>
+
+    <div style="padding-top:64px;border-top:1px solid var(--line);margin-top:16px;">
+      <h2 class="t-h2" style="margin-bottom:10px;">Masz <strong>podobny projekt?</strong></h2>
+      <p class="t-body" style="margin-bottom:28px;">Skontaktuj się — bezpłatna wycena i wizja lokalna.</p>
+      <div class="flex items-center gap-12">
+        <button class="btn-primary" onclick="go('kontakt')">Zamów wycenę</button>
+        <a href="tel:601611500" class="btn-outline" style="text-decoration:none;font-family:var(--mono);">601 611 500</a>
+      </div>
+    </div>
+  </div>
+</div><!-- /realizacje -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: FAQ
+════════════════════════════════════════ -->
+<div class="page" id="page-faq">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>FAQ</span></div>
+      <span class="t-label">Pytania i odpowiedzi</span>
+      <h1 class="t-display">Najczęściej<br><strong>pytają.</strong></h1>
+    </div>
+
+    <div style="max-width:720px;">
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Czy wycena jest bezpłatna?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Tak, całkowicie bezpłatna i bez zobowiązań. Obejmuje wizję lokalną i przygotowanie szczegółowej oferty.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Jaki jest czas realizacji instalacji?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Standardowe realizacje (do 20 kamer) wykonujemy w 1–3 dni roboczych od akceptacji oferty. Większe projekty wyceniamy indywidualnie.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Czy oferujecie serwis po instalacji?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Tak. Gwarancja 24 miesiące oraz opcjonalne umowy SLA. Zdalna diagnostyka i wyjazd w 24h roboczych.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Czy można przeglądać nagrania zdalnie?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Tak. Konfigurujemy zdalny dostęp przez aplikację mobilną lub przeglądarkę. Szkolimy użytkownika z obsługi.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Co to jest e-Toll i kto musi go mieć?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>e-Toll to system elektronicznego poboru opłat za przejazd po drogach krajowych. Obowiązkowy dla pojazdów DMC powyżej 3,5t, autobusów i pojazdów z podwyższonymi emisjami. GPSH montuje OBU i obsługuje konto e-Toll jako certyfikowany operator KAS.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Czy pracujecie w weekendy?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Tak, organizujemy prace w weekendy lub po godzinach jeśli specyfika obiektu tego wymaga (sklep, centrum handlowe). Informacja potrzebna przy składaniu zamówienia.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Jaki jest obszar działania?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Warszawa i całe województwo mazowieckie: Pruszków, Grodzisk Mazowiecki, Piaseczno, Legionowo, Wołomin, Nowy Dwór Mazowiecki, Żyrardów, Otwock i okolice.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Czy systemy można rozbudować?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>Tak. Projektujemy z myślą o przyszłej rozbudowie. Zostawiamy rezerwę kanałów w rejestratorach i centralach. Modernizacja istniejących instalacji to standard w naszej ofercie.</p></div></div>
+      <div class="faq-row" onclick="toggleFaq(this)"><button class="faq-q-row"><span class="faq-q-text">Kamery bezprzewodowe — dobre rozwiązanie?</span><div class="faq-icon"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div></button><div class="faq-a-wrap"><p>W zastosowaniach profesjonalnych rekomendujemy systemy przewodowe IP lub HD-TVI — stabilniejsze, bezpieczniejsze, niezależne od Wi-Fi. Kamery bezprzewodowe sprawdzają się w obiektach mieszkalnych lub jako uzupełnienie instalacji.</p></div></div>
+    </div>
+
+    <div style="padding-top:56px;border-top:1px solid var(--line);margin-top:56px;">
+      <p class="t-body" style="margin-bottom:20px;">Nie znalazłeś odpowiedzi?</p>
+      <div class="flex items-center gap-12">
+        <button class="btn-primary" onclick="go('kontakt')">Kontakt</button>
+        <a href="tel:601611500" class="btn-outline" style="text-decoration:none;font-family:var(--mono);">601 611 500</a>
+      </div>
+    </div>
+  </div>
+</div><!-- /faq -->
+
+
+<!-- ════════════════════════════════════════
+     PAGE: KONTAKT
+════════════════════════════════════════ -->
+<div class="page" id="page-kontakt">
+  <div class="wrap">
+    <div class="pg-header">
+      <div class="breadcrumb"><span onclick="go('home')">GPSH</span><span>Kontakt</span></div>
+      <span class="t-label">Kontakt</span>
+      <h1 class="t-display">Bezpłatna<br><strong>wycena.</strong></h1>
+      <p class="t-lead mt-24">Wypełnij formularz lub zadzwoń. Oddzwonimy w ciągu 2 godzin roboczych. Wizja lokalna gratis.</p>
+    </div>
+
+    <div class="split-layout">
+      <div>
+        <h2 class="t-h2" style="margin-bottom:32px;"><strong>Formularz</strong> wyceny</h2>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="form-grid-2">
+            <div class="form-field"><label class="form-label">Imię i nazwisko *</label><input class="form-input" type="text" placeholder="Jan Kowalski"></div>
+            <div class="form-field"><label class="form-label">Firma</label><input class="form-input" type="text" placeholder="Nazwa firmy"></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field"><label class="form-label">Telefon *</label><input class="form-input" type="tel" placeholder="+48 600 000 000"></div>
+            <div class="form-field"><label class="form-label">E-mail *</label><input class="form-input" type="email" placeholder="jan@firma.pl"></div>
+          </div>
+          <div class="form-field"><label class="form-label">Rodzaj usługi</label>
+            <select class="form-select">
+              <option value="">— wybierz —</option>
+              <option>Monitoring CCTV</option>
+              <option>System alarmowy SSWiN</option>
+              <option>Kontrola dostępu</option>
+              <option>GPS / e-Toll</option>
+              <option>Pakiet kompleksowy</option>
+              <option>Serwis / modernizacja</option>
+            </select>
+          </div>
+          <div class="form-field"><label class="form-label">Adres obiektu</label><input class="form-input" type="text" placeholder="ul. Przykładowa 1, Warszawa"></div>
+          <div class="form-field"><label class="form-label">Opis wymagań</label><textarea class="form-textarea" placeholder="Opisz obiekt i oczekiwania — rodzaj, powierzchnia, liczba kamer lub stref..."></textarea></div>
+          <div class="form-field"><label class="form-label">Preferowany kontakt</label>
+            <select class="form-select"><option>Telefon</option><option>E-mail</option><option>Dowolny</option></select>
+          </div>
+          <div class="cb-row"><input type="checkbox" id="rodo"><label for="rodo">Wyrażam zgodę na przetwarzanie danych osobowych przez GPSH w celu przygotowania oferty i kontaktu. Dane nie będą udostępniane osobom trzecim. *</label></div>
+          <button class="btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:16px;">
+            Wyślij zapytanie
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-block">
+          <p class="t-label" style="margin-bottom:20px;">Dane kontaktowe</p>
+          <div class="ci-row" style="border-top:none;">
+            <span class="ci-label">Telefon</span>
+            <span class="ci-val"><a href="tel:601611500" style="font-family:var(--mono);font-size:17px;font-weight:500;">601 611 500</a></span>
+          </div>
+          <div class="ci-row">
+            <span class="ci-label">E-mail</span>
+            <span class="ci-val"><a href="mailto:kontakt@gpsh.pl">kontakt@gpsh.pl</a></span>
+          </div>
+          <div class="ci-row">
+            <span class="ci-label">Reakcja</span>
+            <span class="ci-val" style="font-size:14px;font-weight:300;color:var(--body);">do 2h roboczych</span>
+          </div>
+          <div class="ci-row">
+            <span class="ci-label">Obszar</span>
+            <span class="ci-val" style="font-size:14px;font-weight:300;color:var(--body);">Warszawa i Mazowsze</span>
+          </div>
+        </div>
+
+        <div class="sidebar-block mt-16">
+          <p class="t-label" style="margin-bottom:16px;">Panele klienta</p>
+          <a href="https://s1.gpsh.pl" target="_blank" class="link-item" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:9px;font-size:14px;color:var(--body);text-decoration:none;">
+            s1.gpsh.pl <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <a href="https://s2.gpsh.pl" target="_blank" class="link-item" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:9px;font-size:14px;color:var(--body);text-decoration:none;">
+            s2.gpsh.pl <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <a href="https://facebook.com/gpsh" target="_blank" class="link-item" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:9px;font-size:14px;color:var(--body);text-decoration:none;">
+            Facebook GPSH <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /kontakt -->
+
+
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">GPSH</div>
+        <p class="footer-desc">Systemy bezpieczeństwa dla firm i obiektów komercyjnych. Warszawa i Mazowsze. Od 2009 roku.</p>
+        <a href="mailto:kontakt@gpsh.pl" class="fl mt-16" style="display:inline-block;">kontakt@gpsh.pl</a>
+      </div>
+      <div>
+        <div class="footer-col-label">Usługi</div>
+        <div class="footer-links">
+          <button class="fl" onclick="go('monitoring')">Monitoring CCTV</button>
+          <button class="fl" onclick="go('alarmy')">Alarmy SSWiN</button>
+          <button class="fl" onclick="go('dostep')">Kontrola dostępu</button>
+          <button class="fl" onclick="go('gps')">GPS / e-Toll</button>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-label">Firma</div>
+        <div class="footer-links">
+          <button class="fl" onclick="go('onas')">O nas</button>
+          <button class="fl" onclick="go('realizacje')">Realizacje</button>
+          <button class="fl" onclick="go('faq')">FAQ</button>
+          <button class="fl" onclick="go('kontakt')">Kontakt</button>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-label">Kontakt</div>
+        <div class="footer-links">
+          <a href="tel:601611500" class="fl" style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--ink);">601 611 500</a>
+          <a href="https://s1.gpsh.pl" target="_blank" class="fl">Panel s1.gpsh.pl</a>
+          <a href="https://s2.gpsh.pl" target="_blank" class="fl">Panel s2.gpsh.pl</a>
+          <a href="https://facebook.com/gpsh" target="_blank" class="fl">Facebook</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2024 GPSH. Wszelkie prawa zastrzeżone.</span>
+      <span class="footer-copy">Certyfikat KAS: DPO15.8751.97.2021</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function go(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nl').forEach(l => l.classList.remove('on'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) { pg.classList.add('active'); window.scrollTo(0, 0); }
+  const ln = document.querySelector('.nl[onclick*="' + id + '"]');
+  if (ln) ln.classList.add('on');
+}
+
+function toggleFaq(row) {
+  const isOpen = row.classList.contains('open');
+  document.querySelectorAll('.faq-row').forEach(r => r.classList.remove('open'));
+  if (!isOpen) row.classList.add('open');
+}
+</script>
+</body>
+</html>
